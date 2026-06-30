@@ -56,13 +56,13 @@ If a LangSmith key is provided, onboarding also enables `LANGCHAIN_PROJECT=openw
 
 Providers and their model options are defined in `PROVIDER_CONFIGS` in `src/constants.ts`:
 
-| Provider   | Env key                | Base URL                          | Models                               |
-|------------|------------------------|-----------------------------------|--------------------------------------|
-| openrouter | `OPENROUTER_API_KEY`   | `https://openrouter.ai/api/v1`    | GLM 5.2, Fusion, Kimi K2.7 Code, Claude Opus/Sonnet, GPT 5.4 mini/5.5 |
-| baseten    | `BASETEN_API_KEY`      | `https://inference.baseten.co/v1` | GLM 5.2, Kimi K2.7 Code             |
-| fireworks  | `FIREWORKS_API_KEY`    | `https://api.fireworks.ai/inference/v1` | GLM 5.2, Kimi K2.7 Code       |
-| openai     | `OPENAI_API_KEY`       | (default)                         | GPT 5.4 mini, GPT 5.5               |
-| anthropic  | `ANTHROPIC_API_KEY`    | (default)                         | Haiku, Sonnet, Opus                  |
+| Provider   | Env key              | Base URL                                | Models                                                                |
+| ---------- | -------------------- | --------------------------------------- | --------------------------------------------------------------------- |
+| openrouter | `OPENROUTER_API_KEY` | `https://openrouter.ai/api/v1`          | GLM 5.2, Fusion, Kimi K2.7 Code, Claude Opus/Sonnet, GPT 5.4 mini/5.5 |
+| baseten    | `BASETEN_API_KEY`    | `https://inference.baseten.co/v1`       | GLM 5.2, Kimi K2.7 Code                                               |
+| fireworks  | `FIREWORKS_API_KEY`  | `https://api.fireworks.ai/inference/v1` | GLM 5.2, Kimi K2.7 Code                                               |
+| openai     | `OPENAI_API_KEY`     | (default)                               | GPT 5.4 mini, GPT 5.5                                                 |
+| anthropic  | `ANTHROPIC_API_KEY`  | (default)                               | Haiku, Sonnet, Opus                                                   |
 
 The default provider is `openrouter`. `resolveConfiguredProvider()` picks the provider from `OPENWIKI_PROVIDER`, falling back to openrouter if `OPENROUTER_API_KEY` is set, then to `DEFAULT_PROVIDER`.
 
