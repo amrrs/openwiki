@@ -2,6 +2,7 @@ export const OPEN_WIKI_DIR = "openwiki";
 export const UPDATE_METADATA_PATH = `${OPEN_WIKI_DIR}/.last-update.json`;
 export const BASETEN_API_KEY_ENV_KEY = "BASETEN_API_KEY";
 export const FIREWORKS_API_KEY_ENV_KEY = "FIREWORKS_API_KEY";
+export const NEBIUS_API_KEY_ENV_KEY = "NEBIUS_API_KEY";
 export const OPENAI_API_KEY_ENV_KEY = "OPENAI_API_KEY";
 export const OPENAI_COMPATIBLE_API_KEY_ENV_KEY = "OPENAI_COMPATIBLE_API_KEY";
 export const OPENAI_COMPATIBLE_BASE_URL_ENV_KEY = "OPENAI_COMPATIBLE_BASE_URL";
@@ -11,12 +12,14 @@ export const OPENROUTER_API_KEY_ENV_KEY = "OPENROUTER_API_KEY";
 export const OPENWIKI_PROVIDER_ENV_KEY = "OPENWIKI_PROVIDER";
 export const OPENWIKI_MODEL_ID_ENV_KEY = "OPENWIKI_MODEL_ID";
 export const DEFAULT_PROVIDER = "openrouter";
+export const NEBIUS_BASE_URL = "https://api.tokenfactory.nebius.com/v1/";
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 export type OpenWikiProvider =
   | "anthropic"
   | "baseten"
   | "fireworks"
+  | "nebius"
   | "openai"
   | "openai-compatible"
   | "openrouter";
@@ -49,6 +52,7 @@ export const SELECTABLE_OPENWIKI_PROVIDERS = [
   "openrouter",
   "baseten",
   "fireworks",
+  "nebius",
   "openai",
   "openai-compatible",
   "anthropic",
@@ -75,6 +79,12 @@ export const PROVIDER_CONFIGS: Record<OpenWikiProvider, ProviderConfig> = {
         label: "Kimi K2.7 Code",
       },
     ],
+  },
+  nebius: {
+    apiKeyEnvKey: NEBIUS_API_KEY_ENV_KEY,
+    baseURL: NEBIUS_BASE_URL,
+    label: "Nebius Token Factory",
+    modelOptions: [{ id: "moonshotai/Kimi-K2.6", label: "Kimi K2.6" }],
   },
   openai: {
     apiKeyEnvKey: OPENAI_API_KEY_ENV_KEY,

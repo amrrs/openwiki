@@ -7,13 +7,21 @@ import {
 import { sanitizeOpenRouterResponseBody } from "../src/agent/index.ts";
 
 describe("sanitizeDiagnosticText", () => {
+  const originalNebiusKey = process.env.NEBIUS_API_KEY;
   const originalOpenAiKey = process.env.OPENAI_API_KEY;
 
   beforeEach(() => {
+    delete process.env.NEBIUS_API_KEY;
     delete process.env.OPENAI_API_KEY;
   });
 
   afterEach(() => {
+    if (originalNebiusKey === undefined) {
+      delete process.env.NEBIUS_API_KEY;
+    } else {
+      process.env.NEBIUS_API_KEY = originalNebiusKey;
+    }
+
     if (originalOpenAiKey === undefined) {
       delete process.env.OPENAI_API_KEY;
     } else {
@@ -30,6 +38,17 @@ describe("sanitizeDiagnosticText", () => {
 
     expect(result).not.toContain("super-secret-value-12345");
     expect(result).toContain("[REDACTED:OPENAI_API_KEY]");
+  });
+
+  test("redacts the Nebius API key when set in the environment", () => {
+    process.env.NEBIUS_API_KEY = "nebius-secret-value-12345";
+
+    const result = sanitizeDiagnosticText(
+      "request failed with key nebius-secret-value-12345 attached",
+    );
+
+    expect(result).not.toContain("nebius-secret-value-12345");
+    expect(result).toContain("[REDACTED:NEBIUS_API_KEY]");
   });
 
   test("redacts OpenAI-style sk- tokens", () => {

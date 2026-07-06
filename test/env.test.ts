@@ -55,6 +55,7 @@ describe("formatEnv", () => {
     const formatted = formatEnv({
       ZZZ_CUSTOM: "z",
       AAA_CUSTOM: "a",
+      NEBIUS_API_KEY: "n",
       OPENWIKI_PROVIDER: "anthropic",
       ANTHROPIC_API_KEY: "k",
     });
@@ -63,9 +64,10 @@ describe("formatEnv", () => {
       .split("\n")
       .map((line) => line.slice(0, line.indexOf("=")));
 
-    // Managed keys keep their MANAGED_ENV_KEYS relative order (ANTHROPIC before
-    // PROVIDER), and the two unknown keys follow, sorted.
+    // Managed keys keep their MANAGED_ENV_KEYS relative order, and the two
+    // unknown keys follow, sorted.
     expect(keys).toEqual([
+      "NEBIUS_API_KEY",
       "ANTHROPIC_API_KEY",
       "OPENWIKI_PROVIDER",
       "AAA_CUSTOM",
