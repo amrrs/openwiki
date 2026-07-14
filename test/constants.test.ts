@@ -1,8 +1,10 @@
 import { describe, expect, test } from "vitest";
 import {
   DEFAULT_MODEL_ID,
+  DEFAULT_PROVIDER_RETRY_ATTEMPTS,
   DEFAULT_PROVIDER,
   getDefaultModelId,
+  getProviderModelOptions,
   isValidBaseUrl,
   isValidModelId,
   isValidProvider,
@@ -11,6 +13,7 @@ import {
   normalizeProvider,
   resolveConfiguredProvider,
   resolveProviderBaseUrl,
+  resolveProviderRetryAttempts,
 } from "../src/constants.ts";
 
 describe("isValidModelId", () => {
@@ -19,6 +22,7 @@ describe("isValidModelId", () => {
     expect(isValidModelId("z-ai/glm-5.2")).toBe(true);
     expect(isValidModelId("accounts/fireworks/models/glm-5p2")).toBe(true);
     expect(isValidModelId("gpt-5.4-mini")).toBe(true);
+    expect(isValidModelId("nvidia/nemotron-3-super-120b-a12b")).toBe(true);
   });
 
   test("rejects empty, whitespace-only, and over-long ids", () => {
@@ -59,6 +63,7 @@ describe("normalizeProvider / isValidProvider", () => {
     expect(isValidProvider("anthropic")).toBe(true);
     expect(isValidProvider("nebius")).toBe(true);
     expect(isValidProvider("openai-compatible")).toBe(true);
+    expect(isValidProvider("nvidia")).toBe(true);
     expect(isValidProvider("nope")).toBe(false);
   });
 });
@@ -74,6 +79,10 @@ describe("resolveConfiguredProvider", () => {
     expect(resolveConfiguredProvider({ OPENROUTER_API_KEY: "x" })).toBe(
       "openrouter",
     );
+  });
+
+  test("falls back to nvidia when only an NVIDIA key is present", () => {
+    expect(resolveConfiguredProvider({ NVIDIA_API_KEY: "x" })).toBe("nvidia");
   });
 
   test("falls back to the default provider when nothing is configured", () => {
@@ -93,6 +102,9 @@ describe("resolveProviderBaseUrl", () => {
       "https://openrouter.ai/api/v1",
     );
     expect(resolveProviderBaseUrl("nebius", {})).toBe(NEBIUS_BASE_URL);
+    expect(resolveProviderBaseUrl("nvidia", {})).toBe(
+      "https://integrate.api.nvidia.com/v1",
+    );
   });
 
   test("prefers a non-empty env override over the default", () => {
@@ -115,6 +127,37 @@ describe("resolveProviderBaseUrl", () => {
   });
 });
 
+describe("resolveProviderRetryAttempts", () => {
+  test("uses the OpenWiki default when no override is set", () => {
+    expect(resolveProviderRetryAttempts({})).toBe(
+      DEFAULT_PROVIDER_RETRY_ATTEMPTS,
+    );
+  });
+
+  test("accepts positive integer retry counts", () => {
+    expect(
+      resolveProviderRetryAttempts({
+        OPENWIKI_PROVIDER_RETRY_ATTEMPTS: "1",
+      }),
+    ).toBe(1);
+    expect(
+      resolveProviderRetryAttempts({
+        OPENWIKI_PROVIDER_RETRY_ATTEMPTS: " 3 ",
+      }),
+    ).toBe(3);
+  });
+
+  test("rejects invalid retry counts", () => {
+    for (const value of ["", "   ", "0", "-1", "1.5", "abc", "1e2"]) {
+      expect(() =>
+        resolveProviderRetryAttempts({
+          OPENWIKI_PROVIDER_RETRY_ATTEMPTS: value,
+        }),
+      ).toThrow(/OPENWIKI_PROVIDER_RETRY_ATTEMPTS/u);
+    }
+  });
+});
+
 describe("isValidBaseUrl", () => {
   test("accepts http and https URLs", () => {
     expect(isValidBaseUrl("https://api.example.com/v1")).toBe(true);
@@ -129,10 +172,25 @@ describe("isValidBaseUrl", () => {
   });
 });
 
+describe("getProviderModelOptions", () => {
+  test("returns OpenAI models in display order", () => {
+    expect(getProviderModelOptions("openai")).toEqual([
+      { id: "gpt-5.6-terra", label: "5.6 Terra" },
+      { id: "gpt-5.6-luna", label: "5.6 Luna" },
+      { id: "gpt-5.6-sol", label: "5.6 Sol" },
+      { id: "gpt-5.5", label: "5.5" },
+      { id: "gpt-5.4-mini", label: "5.4 mini" },
+    ]);
+  });
+});
+
 describe("getDefaultModelId", () => {
   test("returns the first model option for a provider", () => {
     expect(getDefaultModelId("anthropic")).toBe("claude-haiku-4-5");
     expect(getDefaultModelId("nebius")).toBe("moonshotai/Kimi-K2.6");
+    expect(getDefaultModelId("nvidia")).toBe(
+      "nvidia/nemotron-3-super-120b-a12b",
+    );
     expect(getDefaultModelId(DEFAULT_PROVIDER)).toBe(DEFAULT_MODEL_ID);
   });
 
